@@ -168,11 +168,15 @@ export default class AuthorizeHandler {
      */
     public needToLoginAsProvider(): boolean {
 
-        const { scope, launchOptions: { launch_type, provider }} = this;
+        const { scope, launchOptions: { launch_type, provider, id_token }} = this;
 
         // In patient-standalone launch the patient is the user
         if (launch_type === "patient-standalone" || launch_type === "patient-portal") {
             return false;
+        }
+
+        if (!id_token) {
+            return true;
         }
 
         // Require "openid" scope
@@ -184,6 +188,7 @@ export default class AuthorizeHandler {
         if (!(scope.has("profile") || scope.has("fhirUser"))) {
             return false;
         }
+
 
         // If single provider is selected show login if skip_login is not set
         if (provider.size() === 1) {
@@ -544,14 +549,17 @@ export default class AuthorizeHandler {
                     throw new InvalidClientError(`Invalid redirect_uris entry %s. %s`, s, e)
                 }
             });
-
+            
             if (!urls.some(u => {
                 const url = new URL(params.redirect_uri);
+                console.log(url.origin + url.pathname, "vs", u.origin + u.pathname)
                 return (url.origin + url.pathname).startsWith(u.origin + u.pathname);
             })) {
                 throw new InvalidRequestError(`Invalid redirect_uri`)
             }
         }
+
+        // TODO: Check if id_token is valid via identity provider
 
         // PATIENT LOGIN SCREEN
         if (this.needToLoginAsPatient()) {

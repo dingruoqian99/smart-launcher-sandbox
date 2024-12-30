@@ -70,6 +70,7 @@ declare namespace SMART {
         pkce?: PKCEValidation
         client_type?: SMARTClientType
         fhir_server?: string
+        id_token?: string
     }
 
     interface AuthorizeParams {

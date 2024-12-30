@@ -68,6 +68,8 @@ export default class LaunchOptions
 
     fhir_server?: string;
 
+    id_token?: string;
+
     
     constructor(input: string | SMART.LaunchParams)
     {
@@ -92,6 +94,7 @@ export default class LaunchOptions
         this.fhir_server   = input.fhir_server   || ""
         this.provider.set(input.provider || "");
         this.patient.set(input.patient  || "");
+        this.id_token      = input.id_token
     }
 
     public toString(): string

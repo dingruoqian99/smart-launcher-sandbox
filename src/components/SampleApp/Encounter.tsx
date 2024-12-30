@@ -11,7 +11,9 @@ export default function Encounter({ client }: { client: Client }) {
 
     useEffect(() => {
         client.encounter.read()
-            .then(rec => setRecord(rec))
+            .then(rec => {
+                window.parent.postMessage({ type: "setEncounterID", payload: rec.id }, window.location.origin)
+                setRecord(rec)})
             .catch(er => setError(er))
             .finally(() => setLoading(false))
     }, [client])

@@ -3,6 +3,7 @@ import { Helmet, HelmetProvider }                 from "react-helmet-async"
 import { useSearchParams }                        from "react-router-dom"
 import useFetch                                   from "../../hooks/useFetch"
 import { humanName }                              from "../../lib"
+import { decode, encode } from "../../isomorphic/codec"
 
 
 export default function Login() {
@@ -41,7 +42,16 @@ export default function Login() {
             url.searchParams.set("patient", id)
         }
         
-        window.top?.postMessage({
+        // Add id_token to launch context to simulate a successful login (auth flow)
+        const launch = url.searchParams.get("launch")
+        if (launch) {
+            const launchContext = decode(launch)
+            launchContext.id_token = "TEST_ID_TOKEN"
+            const newLaunch = encode(launchContext)
+            url.searchParams.set("launch", newLaunch)
+        }
+        
+        window.parent?.postMessage({
             type: "setUser",
             payload: recs.find(rec => rec.id === id)
         }, window.location.origin);
